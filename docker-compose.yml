@@ -1,13 +1,50 @@
 web:
-  image: nginx:latest
+  image: nginx:stable
   ports:
-  - "8080:80"
+  - "8020:80"
+  - "9090:9090"
   volumes:
+  - ./logs/nginx:/var/log/nginx
   - ./:/home/www/rabbitmq-php.com
-  - ./site.conf:/etc/nginx/conf.d/000_site.conf
+  - ./configs/nginx/site.conf:/etc/nginx/conf.d/000_site.conf
+  - ./configs/nginx/nginx.conf:/etc/nginx/nginx.conf
   links:
   - php
 php:
   image: php:7-fpm
   volumes:
   - ./:/home/www/rabbitmq-php.com
+
+influxdb:
+  image: influxdb:latest
+  container_name: influxdb
+  ports:
+  - "8083:8083"
+  - "8086:8086"
+  - "8090:8090"
+  env_file:
+  - 'env.influxdb'
+  volumes:
+   - ./docker/influxdb/data:/var/lib/influxdb
+
+telegraf:
+  image: telegraf:latest
+  container_name: telegraf
+  links:
+  - influxdb
+  - web
+  volumes:
+  - ./configs/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+  - ./logs:/var/log/:ro
+
+grafana:
+  image: grafana/grafana:latest
+  container_name: grafana
+  ports:
+  - "3000:3000"
+  env_file:
+  - 'env.grafana'
+  links:
+  - influxdb
+  volumes:
+   - ./docker/grafana/data:/var/lib/grafana
