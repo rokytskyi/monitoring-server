@@ -1,5 +1,6 @@
 web:
   image: nginx:stable
+  container_name: web
   ports:
   - "8020:80"
   - "9090:9090"
@@ -12,6 +13,7 @@ web:
   - php
 php:
   image: php:7-fpm
+  container_name: php
   volumes:
   - ./:/home/www/rabbitmq-php.com
 
@@ -48,3 +50,17 @@ grafana:
   - influxdb
   volumes:
    - ./docker/grafana/data:/var/lib/grafana
+
+siege:
+  build: ./siege
+  links:
+  - web
+  volumes:
+  - ./siege/urls.txt:/urls.txt
+  environment:
+  - CONCURRENT=10
+  - REPS=1
+  - TIME=30m
+  #- HEADER="x-api-key:"
+  #- URL=http://web/
+  - FILE=/urls.txt

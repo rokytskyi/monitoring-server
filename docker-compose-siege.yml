@@ -1,0 +1,13 @@
+siege:
+  build: ./siege
+  links:
+  - web
+  volumes:
+  - ./siege/urls.txt:/urls.txt
+  environment:
+  - CONCURRENT=10
+  - REPS=1
+  - TIME=5m
+  #- HEADER="x-api-key:"
+  #- URL=http://web/
+  - FILE=/urls.txt
