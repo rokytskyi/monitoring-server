@@ -1,2 +1,2 @@
-# rabbitmq-php
-RabbitMQ + PHP test drive
+# monitoring-server
+Grafana + telegraf + influxDb test drive
